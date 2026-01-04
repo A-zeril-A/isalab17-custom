@@ -11,7 +11,7 @@ from odoo.http import content_disposition, request
 class TimesheetReport(models.Model):
     _name = 'timesheet.report'
     _description = 'Timesheet Report'
-    _auto = False  # مدل بدون جدول پایگاه داده، فقط برای گزارش
+    _auto = False  # Model without database table, used for reporting only
 
     employee_id = fields.Many2one('hr.employee', string='Employee')
     date = fields.Date(string='Date')
@@ -27,7 +27,7 @@ class TimesheetReport(models.Model):
     # TIME OFF
     leave_type = fields.Char(string='Leave Type')
     
-    # فیلدهای جدید برای محاسبه تأخیر
+    # New fields for delay calculation
     delay_hours = fields.Float(string='Delay Hours', store=True)
     delay_minutes = fields.Integer(string='Delay Minutes', store=True)
     is_delayed = fields.Boolean(string='Is Delayed', store=True)
@@ -44,7 +44,7 @@ class TimesheetReport(models.Model):
     office_hours = fields.Float(
         string='Office Hours (8:30-18:30)',
         compute='_compute_office_hours',
-        help='ساعت کاری در بازه زمانی اداری با محاسبه دقیق'
+        help='Working hours within office time range with precise calculation'
     )
 
     colored_delay_display = fields.Html(string="Delay (Colored)", compute="_compute_colored_delay_display", sanitize=False)
@@ -52,18 +52,18 @@ class TimesheetReport(models.Model):
     hours_shortage = fields.Float(
         string='Hours Shortage', 
         compute='_compute_hours_shortage',
-        help='مقدار ساعت کم کاری نسبت به ۸ ساعت استاندارد'
+        help='Shortage of hours compared to standard 8 hours'
     )
     is_short_hours = fields.Boolean(
         string='Less Than 8 Hours', 
         compute='_compute_hours_shortage',
-        help='آیا کمتر از ۸ ساعت کار کرده است؟'
+        help='Whether worked less than 8 hours'
     )
 
     _italy_holidays_cache = {}
 
     def _format_hours(self, hours_float):
-        """تبدیل float به متن h m"""
+        """Convert float to h:m text format"""
         if hours_float is None:
             return "00:00"
         try:
@@ -76,7 +76,7 @@ class TimesheetReport(models.Model):
 
     @classmethod
     def get_italy_holidays(cls, year):
-        """کش ساده برای جلوگیری از چند بار درخواست API"""
+        """Simple cache to prevent multiple API requests"""
         if not hasattr(cls, "_italy_holidays_cache"):
             cls._italy_holidays_cache = {}
 
@@ -181,15 +181,15 @@ class TimesheetReport(models.Model):
                 record.office_hours = 0.0
                 continue
 
-            # تعریف بازه کاری کارمند
+            # Define employee work time range
             work_start = record.date_time
             work_end = work_start + timedelta(hours=record.total_hours)
 
-            # تعریف بازه کاری اداری (همان روز)
+            # Define office hours range (same day)
             office_start = datetime.combine(record.date, time(5,30))
             office_end = datetime.combine(record.date, time(14,30))
 
-            # محاسبه شروع و پایان مشترک
+            # Calculate overlap start and end
             overlap_start = max(work_start, office_start)
             overlap_end = min(work_end, office_end)
 
@@ -197,7 +197,7 @@ class TimesheetReport(models.Model):
                 overlap_seconds = (overlap_end - overlap_start).total_seconds()
                 office_hours_calculated = overlap_seconds / 3600
 
-                # محدود کردن به حداکثر 8 ساعت
+                # Limit to maximum 8 hours
                 record.office_hours = min(office_hours_calculated, 8.0)
             else:
                 record.office_hours = 0.0
@@ -210,18 +210,18 @@ class TimesheetReport(models.Model):
                 record.hours_18_22 = 0.0
                 continue
 
-            # محاسبه ساعت‌های اضافی بالاتر از 8 ساعت در بازه اداری
+            # Calculate extra hours beyond 8 hours in office range
             overtime_from_office = max(0, record.total_hours - 8.0)
 
-            # تعریف بازه کاری کارمند
+            # Define employee work time range
             work_start = record.date_time
             work_end = work_start + timedelta(hours=record.total_hours)
 
-            # تعریف بازه اضافه کاری (18-22)
+            # Define overtime range (18-22)
             overtime_start = datetime.combine(record.date, time(18,0))
             overtime_end = datetime.combine(record.date, time(22,0))
 
-            # محاسبه ساعت‌های اضافه کاری در بازه 18-22
+            # Calculate overtime hours in 18-22 range
             overtime_overlap_start = max(work_start, overtime_start)
             overtime_overlap_end = min(work_end, overtime_end)
 
@@ -231,8 +231,8 @@ class TimesheetReport(models.Model):
             else:
                 overtime_hours = 0.0
 
-            # جمع ساعت‌های اضافی از بازه اداری و بازه 18-22
-            record.hours_18_22 = min(overtime_from_office + overtime_hours, 4.0)  # حداکثر 4 ساعت در بازه 18-22
+            # Sum extra hours from office range and 18-22 range (max 4 hours in 18-22 range)
+            record.hours_18_22 = min(overtime_from_office + overtime_hours, 4.0)
 
     @api.depends('total_hours')
     def _compute_hours_shortage(self):
@@ -245,13 +245,13 @@ class TimesheetReport(models.Model):
                 record.is_short_hours = False
 
     def generate_xml_report(self, domain=None):
-        """تولید گزارش XML با فرمت مورد نظر با استفاده از Office Hours و اضافه کاری"""
+        """Generate XML report with required format using Office Hours and overtime"""
         if domain is None:
             domain = []
 
         records = self.search(domain)
 
-        # ایجاد mapping از نام کارمند به کد
+        # Create mapping from employee name to code
         employee_code_mapping = {
             'Boustan Sara': '0000013',
             'Glyn Lewis': '0000003',
@@ -264,10 +264,10 @@ class TimesheetReport(models.Model):
             
         }
 
-        # ایجاد ساختار XML مشابه فایل نمونه
+        # Create XML structure similar to sample file
         root = ET.Element("Fornitura")
 
-        # گروه‌بندی رکوردها بر اساس employee_id
+        # Group records by employee_id
         employees = {}
         for record in records:
             employee_key = (record.employee_id.id, record.employee_id.name)
@@ -275,15 +275,15 @@ class TimesheetReport(models.Model):
                 employees[employee_key] = []
             employees[employee_key].append(record)
 
-        # برای هر کارمند
+        # For each employee
         for (emp_id, emp_name), emp_records in employees.items():
             employee_elem = ET.SubElement(root, "Dipendente")
 
-            # کد شرکت
+            # Company code
             employee_elem.set("CodAziendaUfficiale", "000479")
 
-            # کد کارمند - استفاده از mapping بر اساس نام
-            employee_name_lower = emp_name.lower().strip()  # تبدیل به حروف کوچک و حذف فاصله
+            # Employee code - use mapping based on name (convert to lowercase and strip whitespace)
+            employee_name_lower = emp_name.lower().strip()
             employee_code = employee_code_mapping.get(employee_name_lower, str(emp_id).zfill(7))
 
             employee_elem.set("CodDipendenteUfficiale", employee_code)
@@ -291,69 +291,69 @@ class TimesheetReport(models.Model):
             movimenti_elem = ET.SubElement(employee_elem, "Movimenti")
             movimenti_elem.set("GenerazioneAutomaticaDaTeorico", "N")
 
-            # برای هر رکورد کارمند
+            # For each employee record
             for record in emp_records:
-                # حرکت اصلی برای ساعت کاری عادی
+                # Main movement for regular working hours
                 if record.office_hours > 0 or record.leave_type:
                     movimento_elem = ET.SubElement(movimenti_elem, "Movimento")
 
-                    # تعیین نوع کد بر اساس نوع رکورد
+                    # Determine code type based on record type
                     if record.leave_type:
-                        # اگر مرخصی است
+                        # If it's a leave
                         cod_giustificativo = self._get_leave_code(record.leave_type)
                     else:
-                        # اگر تایم شیت معمولی است
+                        # If it's a regular timesheet
                         cod_giustificativo = "OR"
 
                     ET.SubElement(movimento_elem, "CodGiustificativoUfficiale").text = cod_giustificativo
                     ET.SubElement(movimento_elem, "Data").text = record.date.strftime("%Y-%m-%d") if record.date else ""
 
-                    # استفاده از office_hours به جای total_hours
+                    # Use office_hours instead of total_hours
                     if record.office_hours > 0:
                         hours = int(record.office_hours)
                         minutes = int((record.office_hours - hours) * 60)
                     elif record.leave_type:
-                        # برای مرخصی، مقدار پیش‌فرض 8 ساعت
+                        # For leave, default value is 8 hours
                         hours = 8
                         minutes = 0
                     else:
-                        # برای موارد دیگر، صفر
+                        # For other cases, zero
                         hours = 0
                         minutes = 0
 
                     ET.SubElement(movimento_elem, "NumOre").text = str(hours).zfill(2)
                     ET.SubElement(movimento_elem, "NumMinuti").text = str(minutes).zfill(2)
 
-                # حرکت جداگانه برای اضافه کاری (ساعت 18-22)
+                # Separate movement for overtime (18-22 hours)
                 if record.hours_18_22 > 0:
                     movimento_straordinario_elem = ET.SubElement(movimenti_elem, "Movimento")
 
                     ET.SubElement(movimento_straordinario_elem, "CodGiustificativoUfficiale").text = "ST"
                     ET.SubElement(movimento_straordinario_elem, "Data").text = record.date.strftime("%Y-%m-%d") if record.date else ""
 
-                    # محاسبه ساعت و دقیقه اضافه کاری
+                    # Calculate overtime hours and minutes
                     hours_st = int(record.hours_18_22)
                     minutes_st = int((record.hours_18_22 - hours_st) * 60)
 
                     ET.SubElement(movimento_straordinario_elem, "NumOre").text = str(hours_st).zfill(2)
                     ET.SubElement(movimento_straordinario_elem, "NumMinuti").text = str(minutes_st).zfill(2)
 
-                # حرکت جداگانه برای اضافه کاری شبانه (ساعت 22-06)
+                # Separate movement for night overtime (22-06 hours)
                 if record.hours_22_06 > 0:
                     movimento_notturno_elem = ET.SubElement(movimenti_elem, "Movimento")
 
-                    # کد مخصوص اضافه کاری شبانه
+                    # Code for night overtime
                     ET.SubElement(movimento_notturno_elem, "CodGiustificativoUfficiale").text = "STN"
                     ET.SubElement(movimento_notturno_elem, "Data").text = record.date.strftime("%Y-%m-%d") if record.date else ""
 
-                    # محاسبه ساعت و دقیقه اضافه کاری شبانه
+                    # Calculate night overtime hours and minutes
                     hours_notturno = int(record.hours_22_06)
                     minutes_notturno = int((record.hours_22_06 - hours_notturno) * 60)
 
                     ET.SubElement(movimento_notturno_elem, "NumOre").text = str(hours_notturno).zfill(2)
                     ET.SubElement(movimento_notturno_elem, "NumMinuti").text = str(minutes_notturno).zfill(2)
 
-        # تبدیل به رشته XML
+        # Convert to XML string
         xml_str = ET.tostring(root, encoding='utf-8', method='xml')
 
         return xml_str.decode('utf-8')
@@ -445,7 +445,7 @@ class TimesheetReport(models.Model):
         return leave_codes.get(leave_type, 'OR')  # OR به عنوان پیش‌فرض
     
     def action_export_xml(self):
-        """اکشن برای دانلود فایل XML"""
+        """Action to download XML file"""
         domain = []
         if self._context.get('active_ids'):
             domain = [('id', 'in', self._context.get('active_ids'))]
@@ -472,7 +472,7 @@ class TimesheetReport(models.Model):
 
         self.env.cr.execute("""
             CREATE VIEW timesheet_report AS (
-                -- بخش تایم شیت
+                -- Timesheet section
                 SELECT
                     min(ts.id) AS id,
                     ts.employee_id,
@@ -483,7 +483,7 @@ class TimesheetReport(models.Model):
                     min(ts.date_time) + ((sum(ts.unit_amount) || ' hours')::interval) as end_time,
                     COALESCE(sum(ts.unit_amount), 0) as total_hours,
 
-                    -- محاسبه office_hours (حداکثر 8 ساعت)
+                    -- Calculate office_hours (max 8 hours)
                     LEAST(COALESCE(
                         CASE 
                             WHEN min(ts.date_time) IS NOT NULL AND COALESCE(sum(ts.unit_amount), 0) > 0 THEN
@@ -501,7 +501,7 @@ class TimesheetReport(models.Model):
                         END, 0
                     ), 8.0) AS office_hours,
 
-                    -- محاسبه hours_18_22 با در نظر گرفتن ساعت‌های اضافی
+                    -- Calculate hours_18_22 considering extra hours
                     COALESCE(
                         EXTRACT(EPOCH FROM GREATEST(
                             LEAST(
@@ -516,7 +516,7 @@ class TimesheetReport(models.Model):
                     ) + 
                     GREATEST(0, COALESCE(sum(ts.unit_amount), 0) - 8.0) AS hours_18_22,
 
-                    -- محاسبه hours_22_06 (بدون تغییر)
+                    -- Calculate hours_22_06 (unchanged)
                     COALESCE(
                         EXTRACT(EPOCH FROM GREATEST(
                             LEAST(
@@ -530,7 +530,7 @@ class TimesheetReport(models.Model):
                         )) / 3600, 0
                     ) AS hours_22_06,
 
-                    -- روز هفته
+                    -- Day of week
                     CASE 
                         WHEN EXTRACT(DOW FROM ts.date) = 0 THEN 'Sunday'
                         WHEN EXTRACT(DOW FROM ts.date) = 1 THEN 'Monday'
@@ -546,7 +546,7 @@ class TimesheetReport(models.Model):
                         ELSE false
                     END AS is_weekend,
 
-                    -- محاسبات تاخیر
+                    -- Delay calculations
                     CASE 
                         WHEN MIN(ts.date_time) > (date_trunc('day', MIN(ts.date_time)) + interval '5 hours 30 minutes')
                         THEN EXTRACT(EPOCH FROM (MIN(ts.date_time) - (date_trunc('day', MIN(ts.date_time)) + interval '5 hours 30 minutes'))) / 3600
@@ -580,7 +580,7 @@ class TimesheetReport(models.Model):
                         ELSE '0h 0m'
                     END AS delay_display,
 
-                    -- فیلدهای مرخصی
+                    -- Leave fields
                     NULL::integer AS leave_id,
                     NULL::date AS leave_start,
                     NULL::date AS leave_end,
@@ -594,7 +594,7 @@ class TimesheetReport(models.Model):
 
                 UNION ALL
 
-                -- بخش مرخصی
+                -- Leave section
                 SELECT
                     -hl.id AS id,
                     hl.employee_id,
@@ -627,7 +627,8 @@ class TimesheetReport(models.Model):
                     hl.id AS leave_id,
                     hl.request_date_from::date AS date_time,
                     hl.request_date_to::date AS end_time,
-                    ltype.name AS leave_type
+                    -- Extract text value from jsonb translatable field and cast to varchar
+                    COALESCE(ltype.name->>'en_US', ltype.name->>'fa_IR', (SELECT value FROM jsonb_each_text(ltype.name) LIMIT 1))::varchar AS leave_type
                 FROM hr_leave hl
                 JOIN hr_leave_type ltype ON ltype.id = hl.holiday_status_id
                 WHERE hl.state = 'validate'

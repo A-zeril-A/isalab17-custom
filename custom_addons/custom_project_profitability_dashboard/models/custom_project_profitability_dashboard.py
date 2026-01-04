@@ -45,9 +45,9 @@ class CustomProjectProfitabilityDashboard(models.TransientModel):
         existing_lines = self.search([('project_id', '=', project_id)])
         existing_lines.unlink()
 
-        # Retrieve hourly rates from the employee's 'timesheet_cost' field.
+        # Retrieve hourly rates from the employee's 'hourly_cost' field.
         rates = {
-            user.id: user.employee_id.timesheet_cost or 0
+            user.id: user.employee_id.hourly_cost or 0
             for user in self.env['res.users'].browse([d['user_id'][0] for d in data if d['user_id']])
         }
 
@@ -63,7 +63,7 @@ class CustomProjectProfitabilityDashboard(models.TransientModel):
                 'project_id': project_id,
             })
 
-        # TODO: Handle cases where user has no employee or timesheet_cost defined.
+        # TODO: Handle cases where user has no employee or hourly_cost defined.
         # Optionally, log a warning or notify the admin.
 
         # TODO: For large datasets, consider using batch create for performance.

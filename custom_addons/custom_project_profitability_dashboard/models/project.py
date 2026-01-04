@@ -37,7 +37,7 @@ class Project(models.Model):
 
     @api.depends(
         'timesheet_ids.unit_amount',
-        'timesheet_ids.employee_id.timesheet_cost',
+        'timesheet_ids.employee_id.hourly_cost',
         'sale_order_id.order_line', 
         'sale_order_id.custom_total_net_sum',
         'sale_order_id.business_trip_ids.final_total_cost'
@@ -62,7 +62,7 @@ class Project(models.Model):
             
             if timesheet_data:
                 employee_ids = [d['employee_id'][0] for d in timesheet_data]
-                employee_costs = {emp.id: emp.timesheet_cost for emp in self.env['hr.employee'].browse(employee_ids)}
+                employee_costs = {emp.id: emp.hourly_cost for emp in self.env['hr.employee'].browse(employee_ids)}
                 for line in timesheet_data:
                     employee_id = line['employee_id'][0]
                     employee_name = line['employee_id'][1]
@@ -248,7 +248,7 @@ Please verify and update their timesheet costs in the HR module to ensure accura
         return sale_orders
 
     # TODO: For future improvements, consider making the facilities cost percentage configurable from settings.
-    # TODO: Log a warning when a user has no defined timesheet_cost
+    # TODO: Log a warning when an employee has no defined hourly_cost
 
 class CustomProjectProfitabilityDashboard(models.TransientModel):
     _name = 'custom.project.profitability.dashboard'
