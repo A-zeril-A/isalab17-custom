@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Add offer_deadline field to CRM form -->
+    <record id="view_crm_lead_form_offer_deadline" model="ir.ui.view">
+        <field name="name">crm.lead.form.offer.deadline</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Offer Deadline field after partner_id -->
+            <xpath expr="//sheet//group/field[@name='partner_id']" position="after">
+                <field name="offer_deadline"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add offer_deadline field to CRM Kanban -->
+    <record id="view_crm_lead_kanban_offer_deadline" model="ir.ui.view">
+    <field name="name">crm.lead.kanban.offer.deadline</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+    <field name="arch" type="xml">
+        <!-- Add title and Offer Deadline field at the top of the Kanban card -->
+        <!-- In Odoo 17, o_kanban_record_title is a <strong> element, not <div> -->
+        <xpath expr="//strong[hasclass('o_kanban_record_title')]" position="after">
+            <div class="o_kanban_offer_deadline">
+                <strong>Offer Deadline: </strong>
+                <field name="offer_deadline"/>
+            </div>
+        </xpath>
+    </field>
+</record>
+
+</odoo>

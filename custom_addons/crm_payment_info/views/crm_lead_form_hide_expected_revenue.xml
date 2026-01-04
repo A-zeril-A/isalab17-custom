@@ -1,0 +1,12 @@
+<odoo>
+  <record id="view_crm_lead_form_inherit_hide_revenue" model="ir.ui.view">
+    <field name="name">crm.lead.form.inherit.hide.revenue</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@class='oe_title']//field[@name='expected_revenue']" position="replace">
+        <attribute name="invisible"></attribute>
+      </xpath>
+    </field>
+  </record>
+</odoo>

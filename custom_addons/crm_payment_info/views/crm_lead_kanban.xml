@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_case_kanban_view_leads_payment_info" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.payment.info</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_kanban_bottom_left')]" position="inside">
+                <!-- Payment Information -->
+                <div class="mt-2">
+                    <div>Total: <field name="amount_total" widget="monetary"/></div>
+                    <div>Paid: <field name="amount_paid" widget="monetary"/></div>
+                    <div>Due: <field name="amount_due" widget="monetary"/></div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

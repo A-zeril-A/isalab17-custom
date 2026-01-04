@@ -1,0 +1,26 @@
+[options]
+; === Database ===
+db_host = False
+db_port = False
+db_user = odoo
+db_password = False
+db_name = isalab_v17
+
+; === Addons ===
+addons_path = /opt/odoo/isalab17/odoo/addons,/opt/odoo/isalab17/addons,/opt/odoo/isalab17/custom_addons,/opt/odoo/isalab17/custom_3rdP_addons/module_from_oca,/opt/odoo/isalab17/custom_3rdP_addons/module_from_other_vendor
+
+; === Data & Logs ===
+data_dir = /opt/odoo/.local
+logfile = /opt/odoo/isalab17/logs/odoo17.log
+log_level = info
+
+; === HTTP ===
+http_port = 8017
+proxy_mode = False
+list_db = True
+
+; === Server ===
+admin_passwd = admin
+workers = 0
+server_wide_modules = base,web
+

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <record id="action_make_sale_revision_wizard" model="ir.ui.view">-->
+<!--        <field name="name">Revision</field>-->
+<!--        <field name="model">sale.order.revision.wizard</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form string="Make Revision">-->
+<!--                <group>-->
+<!--                    <group>-->
+<!--                        <field name="order_id" invisible="1"/>-->
+<!--                        <field name="revision_id" invisible="1"/>-->
+<!--                        <field name="next_code"/>-->
+<!--                    </group>-->
+<!--                    <group>-->
+<!--                        <field name="reason"/>-->
+<!--                    </group>-->
+<!--                </group>-->
+<!--                <footer>-->
+<!--                    <button name="create_revision" string="_Apply" type="object" class="btn-primary"/>-->
+<!--                    <button string="Cancel" class="btn-secondary" special="cancel"/>-->
+<!--                </footer>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <act_window id="action_make_revision_wizard_sale" name="Make Revision" res_model="sale.order.revision.wizard"-->
+<!--                view_mode="form" target="new"/>-->
+
+    <record id="action_sale_order_revision" model="ir.ui.view">
+        <field name="name">Revision</field>
+        <field name="model">sale.order.revision.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Revision">
+                <group>
+                    <group>
+                        <field name="order_id" invisible="1"/>
+                        <field name="revision_id" invisible="1"/>
+                        <field name="next_code"/>
+                    </group>
+                    <group>
+                    <field name="reason"/>
+                </group>
+                </group>
+
+                <footer>
+                    <button name="create_revision" string="_Apply" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <act_window id="action_revision_wizard_sale_order" name="Revision" res_model="sale.order.revision.wizard"
+                view_mode="form" target="new"/>
+
+
+</odoo>

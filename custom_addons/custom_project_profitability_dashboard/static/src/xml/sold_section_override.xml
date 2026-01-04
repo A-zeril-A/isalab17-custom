@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+  <!-- Override the title of the "SoldSection" panel to display a custom label -->
+  <t t-inherit="sale_timesheet.SoldSection" t-inherit-mode="extension" owl="1">
+    <xpath expr="//div[@class='o_rightpanel_title']" position="replace">
+      <div class="o_rightpanel_title">Contract Terms</div>
+    </xpath>
+  </t>
+
+  <!-- Override the label "Total Sold" to a more meaningful project-specific label -->
+  <t t-inherit="sale_timesheet.TotalSoldSection" t-inherit-mode="extension" owl="1">
+    <xpath expr="//span[contains(text(), 'Total Sold')]" position="replace">
+      <span class="o_rightpanel_left_col o_rightpanel_left_text">Project's Time Performance</span>
+    </xpath>
+  </t>
+
+  <!-- Override the title of the "Profitability" section -->
+  <t t-inherit="sale_timesheet.ProfitabilitySection" t-inherit-mode="extension" owl="1">
+    <xpath expr="//div[@class='o_rightpanel_title'][contains(text(), 'Profitability')]" position="replace">
+      <div class="o_rightpanel_title">Project Financial Performance</div>
+    </xpath>
+  </t>
+
+  <!-- Customize the first <span> in each profitability data row:
+       - Highlight "Project Margin" and "Margin" with color and monospace font
+       - Add a horizontal separator before "Taxes" and color it yellow
+       - Default display for all other items -->
+  <t t-inherit="sale_timesheet.ProfitabilitySection" t-inherit-mode="extension" owl="1">
+    <xpath expr="//div[@class='o_rightpanel_data_row']/span" position="replace">
+      <span class="o_rightpanel_left_col o_rightpanel_left_text">
+
+        <!-- Highlight 'Margin' in green -->
+        <t t-if="profitability.name == 'Margin'">
+          <strong style="color: green; font-family: monospace; font-size: 14px; font-weight: 800;">Margin</strong>
+        </t>
+
+        <!-- Add a dashed line before 'Taxes' and highlight it in yellow -->
+        <t t-elif="profitability.name == 'Taxes'">
+          <div style="border-top: 1px dashed #ccc; width: 50%; margin: 8px 0;"></div>
+          <strong style="color: goldenrod;">Taxes</strong>
+        </t>
+
+        <!-- Default behavior for all other entries -->
+        <t t-else="">
+          <t t-esc="profitability.name"/>
+        </t>
+        
+      </span>
+    </xpath>
+  </t>
+
+</templates>

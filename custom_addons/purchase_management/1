@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_management_form" model="ir.ui.view">
+        <field name="name">purchase.management.view.form</field>
+        <field name="model">purchase.management</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    
+                    <!-- <button name="action_to_budget_approver" string="Send To Budget Approver" class="oe_highlight" type="object" states="purchaser_start" attrs="{'invisible': ['|', ('state', '!=', 'purchaser_start'), ('exceed_budget_limit', '=', False)]}"/> -->
+                    <button name="action_to_budget_approver" string="Send To Budget Approver" class="oe_highlight" type="object" states="purchaser_start" attrs="{'invisible': [('exceed_budget_limit', '=', False)]}"/> 
+                    <button name="action_to_purchaser" string="Send to Purchaser" class="oe_highlight" type="object" states="send2res"/>
+                    <button name="action_to_res" string="Send to Responsible" class="oe_highlight" type="object" states="draft"/>
+                    <!-- the Approve is comented because it's do nothing, we able to change the state from "Send to Purhcaser"-->
+                    <!--<button name="action_approving" string="Approve" class="oe_highlight" type="object" states="send2res" groups="purchase_management.group_purchase_approval"/> -->
+                    <button name="action_done" string="Mark as done" class="oe_highlight" type="object" states="approve,purchaser_start" attrs="{'invisible': ['&amp;',('state','!=','purchaser_start'),('exceed_budget_limit','=',True)]}" groups="purchase_management.group_purchase_approval"/>
+                    <button name="%(purchase_management.action_refuse_purchase)d" string="Refuse" type="action" states="send2res,approve"/>
+                    <button name="action_to_draft" string="Back to draft" type="object" states="done,purchaser_start"/>
+                     <!--Rewrite the buttons 
+                    <button name="action_to_res" string="Send to Responsible" class="oe_highlight" type="object" states="draft"/>
+                    <button name="action_to_purchaser" string="Send to Purchaser" class="oe_highlight" type="object" states="send2res" groups="purchase_management.group_purchase_approval"/>
+                    <button name="action_to_budget_approver" string="Send to budget approver" class="oe_highlight" type="object" states="purchaser_start" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('exceed_budget_limit', '!=', True)]}"/>
+                    <button name="action_done" string="Mark as done" class="oe_highlight" type="object" groups="purchase_management.group_purchase_admin" states="budget_approve,purchaser_start"/>-->
+                    <!-- I disabled the utility to click on the states I want to do it with the buttons  options="{'clickable' : '1'}" -->
+                    <field name="state" widget="statusbar"/>
+                    <!-- For hiding the states we can use this command statusbar_visible="draft,invoice,done"-->
+                </header>
+                <sheet>
+                    <group>
+
+                        <group>
+                            <field name="name"/>
+                            <field name="source_document"/>
+                            <field name="active" invisible="1"/>
+                            <field name="zlab_contact_id"/>
+                            <field name="responsible_id"/>
+                            <field name="arca_number"/>
+                            <field name="exceed_budget_limit"/>                            
+                        </group>
+                        <group>
+                            <field name="ordering_num" readonly="1"/>
+                            <field name="order_date"/>
+                            <field name="deadline_date"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color'}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="total_amount" widget="monetary" options="{'currency_field':'currency_id'}"
+                                class="oe_inline" t-attf-class="{'oe_total_exceeds': amount_total > 20}"/>
+                        </group>
+                    </group>
+                    <!-- Notebook Area -->
+                    <notebook>
+                        <page name="order" string="Order Lines">
+                            <field name="product_line_ids"
+                                    widget="section_and_note_one2many">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    
+                                    <field name="price_unit" widget="monetary" groups="purchase_management.group_purchase_admin"/>
+                                    <!--<field name="price_unit"/> -->
+                                    <field name="qty"/>
+                                    <field name="currency_id" invisible="True"/>
+                                    <field name="price_subtotal" sum="Totals:" widget="monetary" />
+                                    <!--<field name="price_total"/> -->
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="qty"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook> 
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" group="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <!--TREE VIEW -->
+    <record id="view_purchase_management_tree" model="ir.ui.view">
+        <field name="name">purchase.management.view.tree</field>
+        <field name="model">purchase.management</field>
+        <field name="arch" type="xml">
+            <!-- Also here we can handling the auto editable-->
+            <tree decoration-success="state == 'done'" decoration-danger="state == 'cancel'" decoration-info="state == 'invoice'">
+                <field name="name" string="Purchase Name"></field>
+                <!-- Put the purchaser id view in the comment -->
+                <!--      <field name="purchaser_id" widget="many2one_avatar"/> -->
+                <field name="ordering_num" string="Ordering Number"></field>
+                <field name="deadline_date" string="Deadline"/>
+                <field name="activity_ids" widget="list_activity"/>
+                <field name="state"
+                decoration-success="state == 'done' or state == 'approve'"
+                decoration-info="state in ('draft','invoice')"
+                decoration-danger="state == 'cancel'"
+                widget="badge"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Activity View-->
+    <record id="purchase_management_view_activity" model="ir.ui.view">
+        <field name="name">purchase.management.view.activity</field>
+        <field name="model">purchase.management</field>
+        <field name="arch" type="xml">
+            <activity string="Purchase">
+                <!-- Put the purchaser in the comment-->
+                <!-- <field name="purchaser_id"/> -->
+                <field name="name"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <field name="ordering_num"/>
+                        <div style="padding:40px;">
+                            <!-- 
+                            <field name="purchaser_id" display="full"/>
+                            -->
+                    </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+    <!-- Calendar View-->
+    <record id="purchase_management_view_calendar" model="ir.ui.view">
+        <field name="name">purchase.management.view.calendar</field>
+        <field name="model">purchase.management</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <calendar string="Purchases" date_start="order_date" date_stop="deadline_date" event_open_popup="true"
+                        color="state" mode="month" quick_add="false" event_limit="5">
+                <field name="state" filters="1" invisible="1"/>
+                <field name="name"/>
+                <!-- 
+                <field name="purchaser_id"/>-->
+                <field name="ordering_num"/>
+
+            </calendar>
+        </field>
+    </record>
+
+    <!--SEARCH -->
+    <record id="purchase_management_view_search" model="ir.ui.view">
+        <field name="name">purchase.management.view.search</field>
+        <field name="model">purchase.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="name" string="Purchase Name" domain="[('name', 'ilike', self)]" />
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+                <!-- 
+                <searchpanel>
+                    <field name="category_ids" string="Categories" enable_counter="1"/>
+                </searchpanel> -->
+            </search>
+        </field>
+    </record>
+
+    <record id="action_purchase_management" model="ir.actions.act_window">
+        <field name="name">Purchases</field>
+        <field name="res_model">purchase.management</field>
+        <field name="view_mode">tree,form,activity,calendar</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Purchase order
+            </p>
+        </field>
+    </record>
+    
+    <menuitem
+    id="menu_purchase_management_master"
+    parent="purchase_management_root"
+    action="action_purchase_management"
+    name="Purcheses"
+    sequence="0"/>
+    
+</odoo>

@@ -1,0 +1,25 @@
+<odoo>
+    <record id="crm_lead_kanban_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.view.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="arch" type="xml">
+            <!-- kanban -->
+            <xpath expr="//div[contains(@class, 'o_kanban_record')]//field[@name='expected_revenue']"
+                   position="replace">
+                <t t-if="record.can_see_financials">
+                    <field name="expected_revenue"/>
+                </t>
+                <t t-else="">
+                    <span class="text-muted"></span>
+                </t>
+            </xpath>
+            <xpath expr="//kanban" position="inside">
+                <progressbar field="activity_state"
+                             colors='{"planned": "success", "today": "warning", "overdue": "danger"}'
+                             help="This bar allows to filter the opportunities based on scheduled activities."/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

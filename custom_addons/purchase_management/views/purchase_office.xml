@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_office_form" model="ir.ui.view">
+        <field name="name">purchase.office.view.form</field>
+        <field name="model">purchase.office</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                        <field name="officeName"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="officeAdd"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="purchase_office_view_tree" model="ir.ui.view">
+        <field name="name">purchase.office.view.tree</field>
+        <field name="model">purchase.office</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="officeName"/>
+                <field name="officeAdd"/>
+            </tree>
+        </field>
+    </record>
+    <!-- ACTION -->
+    <record id="action_purchase_office" model="ir.actions.act_window">
+        <field name="name">Offices</field>
+        <field name="res_model">purchase.office</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first office address!!
+            </p>
+        </field>
+
+    </record>
+<!-- MENU ITEM 
+    <menuitem
+        id="menu_offices"
+        parent="purchase_management_root"
+        name="Offices"
+        action="action_purchase_office"
+        sequence="2"/>
+-->
+</odoo>

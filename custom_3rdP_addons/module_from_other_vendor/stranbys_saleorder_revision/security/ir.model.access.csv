@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+sale_order_revision_crud,sale_order_revision_crud,model_sale_order_revision,base.group_user,1,1,1,0
+sale_order_revision_wizard_crud,sale_order_revision_wizard_crud,model_sale_order_revision_wizard,base.group_user,1,1,1,1

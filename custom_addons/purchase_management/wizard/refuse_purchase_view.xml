@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_refuse_purchase_wizard" model="ir.ui.view">
+        <field name="name">refuse.purchase.wizard.view.form</field>
+        <field name="model">refuse.purchase.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="purchase_id"/>
+                    <field name="reason"/>
+                </group>
+                <footer>
+                    <button name="action_refuse" string="Refuse Purchase" type="object"
+                    class="btn-primary" data-hotkey="q"/>
+                    <button special="cancel" data-hotkey="z" string="Discard"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--ACTION-->
+    <record id="action_refuse_purchase" model="ir.actions.act_window">
+        <field name="name">Refuse Purchase</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">refuse.purchase.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <!-- <field name="domain">[]</field>
+        <field name="context">{}</field> -->
+    </record>
+    
+</odoo>

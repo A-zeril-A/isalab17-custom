@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.purchase_management</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <div class="app_settings_block" data-string="Purchase Management" id="purchase_management" string="Purchase Management" data-key="purchase_management">
+                        <h2>Purchase Management</h2>
+                        <div class="row mt16 o_settings_container" id="end contract_settings">
+                            <div class="cl-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_lable">End Date Contract Alert</span>
+                                    <div class="text-muted content-group mt16">
+                                        <span>Send an alert</span>
+                                        <field name="specific_user_id" class="text-center oe_inline"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </xpath>
+            </field>
+        </record>
+        <record id="purchase_management_config_sttings_action" model="ir.actions.act_window">
+            <field name="name">Setting</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_mode">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'purchase_management','bin_size': False}</field>
+        </record>
+
+        <menuitem
+        id="menu_purchase_management_configuration"
+        parent="purchase_management_root"
+        action="purchase_management_config_sttings_action"
+        name="Configuration"
+        sequence="4"/>
+
+    </data>
+    
+
+</odoo>

@@ -1,0 +1,146 @@
+<odoo>
+    <!-- Define security groups -->
+    <record id="group_purchase_user" model="res.groups">
+        <field name="name">Purchase Users</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_purchase_purchaser" model="res.groups">
+        <field name="name">Purchaser Role</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_purchase_budget_approver" model="res.groups">
+        <field name="name">Purchase Budget Approver</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_purchase_admin" model="res.groups">
+        <field name="name">Purchase Administrators</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <!-- Define access control rules -->
+    <record id="group_purchase_approval" model="res.groups">
+        <field name="name">Purchase Approval</field>
+    </record>
+
+
+    <!-- Define access control rules -->
+    <record id="purchase_management_rule_user" model="ir.rule">
+        <field name="name">Purchase Management User Rule</field>
+        <field name="model_id" ref="model_purchase_management"/>
+        <field name="domain_force">['|',('create_uid','=',user.id),('message_partner_ids', 'in',
+            [user.partner_id.id])]
+        </field>
+        <field name="groups" eval="[(4, ref('group_purchase_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+
+    <record id="purchase_management_rule_admin" model="ir.rule">
+        <field name="name">Purchase Management Admin Rule</field>
+        <field name="model_id" ref="model_purchase_management"/>
+        <field name="groups" eval="[(4, ref('group_purchase_admin'))]"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+
+    <!-- Adjust the access control rule for the responsible user to grant similar access permissions -->
+    <record id="purchase_management_rule_approval" model="ir.rule">
+        <field name="name">Purchase Management Approval Rule</field>
+        <field name="model_id" ref="model_purchase_management"/>
+        <field name="groups" eval="[(4, ref('group_purchase_approval'))]"/>
+        <field name="domain_force">[('responsible_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Adjust the access control rule for the responsible user to grant similar access permissions -->
+    <record id="purchase_management_rule_purchaser" model="ir.rule">
+        <field name="name">Purchase Management Purchaser Rule</field>
+        <field name="model_id" ref="model_purchase_management"/>
+        <field name="groups" eval="[(4, ref('group_purchase_purchaser'))]"/>
+        <field name="domain_force">['|',('create_uid','=',user.id),('message_partner_ids', 'in',
+            [user.partner_id.id])]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="purchase_management_rule_budget_approver" model="ir.rule">
+        <field name="name">Purchase Management Budget Approver</field>
+        <field name="model_id" ref="model_purchase_management"/>
+        <field name="groups" eval="[(4, ref('group_purchase_budget_approver'))]"/>
+        <field name="domain_force">['|',('create_uid','=',user.id),('message_partner_ids', 'in',
+            [user.partner_id.id])]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+
+    <!-- Iman 21 Jan >> Purchase Category GP & Rule -->
+    <record id="group_purchase_category" model="res.groups">
+        <field name="name">Purchase Management Category Editors Group</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="purchase_management_rule_category" model="ir.rule">
+        <field name="name">Purchase Management Category Editor Rule</field>
+        <field name="model_id" ref="model_purchase_categ"/>
+        <field name="domain_force">['|',('create_uid','=', user.id), ('create_uid', 'in', [24, 25])]</field>
+        <field name="groups" eval="[(4, ref('group_purchase_category'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="access_purchase_category_user" model="ir.model.access">
+        <field name="name">access_purchase_categ_user</field>
+        <field name="model_id" ref="model_purchase_categ"/>
+        <field name="group_id" ref="group_purchase_category"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Iman 22 Jan >> Purchase Product GP & Rule -->
+    <record id="group_order_product" model="res.groups">
+        <field name="name">Purchase Management Product Editors Group</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="purchase_management_rule_product" model="ir.rule">
+        <field name="name">Purchase Management Product Editor Rule</field>
+        <field name="model_id" ref="model_order_product"/>
+        <field name="domain_force">['|',('create_uid','=', user.id), ('create_uid', 'in', [24, 25])]</field>
+        <field name="groups" eval="[(4, ref('group_order_product'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="access_order_product_user" model="ir.model.access">
+        <field name="name">access_order_product_user</field>
+        <field name="model_id" ref="model_order_product"/>
+        <field name="group_id" ref="group_order_product"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

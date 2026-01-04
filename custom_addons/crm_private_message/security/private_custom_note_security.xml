@@ -1,0 +1,9 @@
+<odoo>
+    <record id="group_custom_private_message_access_crm" model="res.groups">
+        <field name="name">Custom Private Message Access for CRM</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="model_access"
+               eval="[(0, 0, {'name': 'Mail Access', 'model_id': ref('mail.model_mail_mail'), 'perm_read': True, 'perm_write': True, 'perm_create': True, 'perm_unlink': True})]"/>
+    </record>
+
+</odoo>

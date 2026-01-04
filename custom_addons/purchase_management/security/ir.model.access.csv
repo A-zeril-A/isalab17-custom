@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access.purchase.management,access_purchase_management,purchase_management.model_purchase_management,base.group_user,1,1,1,1
+access.purchase.categ,access_purchase_categ,purchase_management.model_purchase_categ,base.group_user,1,1,1,1
+access.order.product,access_order_product,purchase_management.model_order_product,base.group_user,1,1,1,1
+access.purchase.product.lines,access_purchase_product_lines,purchase_management.model_purchase_product_lines,base.group_user,1,1,1,1
+access.refuse.purchase.wizard,access_refuse_purchase_wizard,purchase_management.model_refuse_purchase_wizard,base.group_user,1,1,1,1
+access.purchase.office,access_purchase_office,purchase_management.model_purchase_office,base.group_user,1,1,1,1
+access_purchase_config_settings_user,purchase.config.settings.user,model_res_config_settings,,1,1,0,0
+
+

@@ -1,0 +1,7 @@
+<odoo>
+
+    <record id="project.project_update_all_action" model="ir.actions.act_window">
+        <field name="name">Contract Performance Sheet</field> 
+    </record>
+
+</odoo>

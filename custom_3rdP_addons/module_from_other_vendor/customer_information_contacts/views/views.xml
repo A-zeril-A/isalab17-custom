@@ -1,0 +1,40 @@
+<odoo>
+    <data>
+    <record id="view_res_partner_form_extension" model="ir.ui.view">
+        <field name="name">res.partner.form.extension</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+                <xpath expr="//notebook/page[1]" position="before">
+                    <page string="FAIRS SHEET" name="fairs_sheet">
+                        <group> 
+                            <field name="updateDateField"/>
+                            <field name="companySectores"/>
+                            <field name="contSecReach"/>
+                            <field name="secTarget"/>
+                            <field name="currentContracts"/>
+                            <field name="currentProject"/>
+                            <field name="currentSup"/>
+                            <field name="customerLinkedin"/>
+                            <field name="notes"/>
+                            <field name="generalNda"/>
+                            <field name="contactOfTheCompany"/>
+                        </group>
+                    </page>
+                </xpath>
+        </field>
+    </record>
+    <!-- Set the "Scheda fiera" page as the default view
+    <record id="view_res_partner_form_extension" model="ir.ui.view">
+        <field name="name">res.partner.form.extension</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="default_focus">scheda_fiere</attribute>
+            </xpath>
+        </field>
+</record>
+	-->
+</data>
+</odoo>

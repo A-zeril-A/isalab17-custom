@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_custom_profitability_access" model="res.groups">
+        <field name="name">Custom Profitability Access</field>
+        <field name="category_id" ref="base.module_category_project"/>
+        <field name="implied_ids" eval="[(4, ref('analytic.group_analytic_accounting'))]"/>
+    </record>
+</odoo>

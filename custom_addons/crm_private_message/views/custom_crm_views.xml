@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_form_crm_lead_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Opportunity Commercial Private Chat 💬" groups="crm_private_message.group_custom_private_message_access_crm">
+                    <field name="custom_message_ids">
+                        <tree>
+                            <field name="create_date"/>
+                            <field name="user_id"/>
+                            <field name="mentioned_user_ids" widget="many2many_tags"/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                            <field name="message"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_crm_lead_custom_message_form" model="ir.ui.view">
+        <field name="name">crm.lead.custom.private.message.form</field>
+        <field name="model">crm.lead.custom.private.message</field>
+        <field name="arch" type="xml">
+            <form string="Custom Message">
+                <sheet>
+                    <group>
+                        <field name="lead_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="message"/>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                        <field name="mentioned_user_ids"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

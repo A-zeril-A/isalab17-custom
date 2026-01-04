@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- Inheriting the original kanban view from project module -->
+    <record id="custom_project_view_kanban_inherit_project" model="ir.ui.view">
+      <field name="name">custom.project.kanban.inherit.project</field>
+      <field name="model">project.project</field>
+      <!-- Here is the reference to the view you want to inherit -->
+      <field name="inherit_id" ref="project.project_view_kanban_inherit_project"/>
+      <field name="arch" type="xml">
+        <!-- Replace the button text 'Project Updates' with 'Contract Performance Sheet' -->
+        <xpath expr="//div[@role='menuitem']/a[@name='%(project.project_update_all_action)d']" position="replace">
+            <a name="%(project.project_update_all_action)d"           
+            type="action"            
+            t-attf-context="{'active_id': #{record.id.raw_value}}">
+                <span style="font-size: 11px;">Contract Performance Sheet</span>
+            </a>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

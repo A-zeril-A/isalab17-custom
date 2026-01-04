@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_form" model="ir.ui.view">
+        <field name="name">product.view.form</field>
+        <field name="model">order.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="productName"/>
+                        <field name="productPrice" widget='monetary'/>
+                        <field name="productLink" widget='url'/>
+                    </group>
+                    <group>
+                        <field name="product_cat" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" group="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <!--TREE VIEW -->
+    <record id="view_product_tree" model="ir.ui.view">
+        <field name="name">product.view.tree</field>
+        <field name="model">order.product</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="productName"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--ACTION-->
+    <record id="action_product" model="ir.actions.act_window">
+        <field name="name">Product</field>
+        <field name="res_model">order.product</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Product!
+            </p>
+        </field>
+    </record>
+
+    
+    <menuitem
+    id="product"
+    parent="purchase_management_root"
+    action="action_product"
+    name="Products"
+    sequence="3"/>
+    
+</odoo>

@@ -1,0 +1,61 @@
+<odoo>
+    <record id="view_crm_lead_form_inherit_payment_summary" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit.payment.summary</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='expected_revenue']" position="after">
+                <div class="o_group">
+                    <div class="o_horizontal_separator">Sales summary</div>
+                    <group>
+                        <group>
+                            <div class="oe_inline" style="width: 100%;">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th></th>
+                                            <th>Paid</th>
+                                            <th></th>
+                                            <th>Unpaid</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <field name="amount_total" widget="monetary" options="{'field_currency': 'currency_id'}" nolabel="1"/>
+                                            </td>
+                                            <td>=</td>
+                                            <td>
+                                                <field name="amount_paid" widget="monetary" options="{'field_currency': 'currency_id'}" nolabel="1"/>
+                                            </td>
+                                            <td>+</td>
+                                            <td>
+                                                <field name="amount_due" widget="monetary" options="{'field_currency': 'currency_id'}" nolabel="1"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-sm mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th>Untaxed Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <field name="amount_untaxed" widget="monetary" options="{'field_currency': 'currency_id'}" nolabel="1"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
+                    </group>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Essential changes only -->
+        <record id="view_order_form_custom" model="ir.ui.view">
+            <field name="name">sale.order.form.custom</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Add manual_price_subtotal field in tree view -->
+                <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="after">
+                   
+                    <field name="manual_price_subtotal" string="Subtotal"/>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+
+    </data>
+</odoo>

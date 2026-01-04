@@ -1,0 +1,28 @@
+<odoo>
+    <record id="view_crm_lead_form_extension" model="ir.ui.view">
+        <field name="name">crm.lead.form.extension</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//notebook" position="inside">
+                    <page string="FAIRS SHEET" name="fairs_sheet">
+                        <group name="form" string="Form"> 
+                            <field name="updateDateField"/>
+                            <field name="companySectores"/>
+                            <field name="contSecReach"/>
+                            <field name="secTarget"/>
+                            <field name="currentContracts"/>
+                            <field name="currentProject"/>
+                            <field name="currentSup"/>
+                            <field name="customerLinkedin"/>
+                            <field name="notes"/>
+                            <field name="generalNda"/>
+                            <field name="contactOfTheCompany"/>
+                        </group>
+                    </page>
+                </xpath>
+            </data>
+        </field>
+    </record>
+</odoo>

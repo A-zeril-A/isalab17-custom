@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="purchase_management_root"
+        web_icon="purchase_management,static/description/icon.png"
+        name="Purchase Management"
+        sequence="0"/>
+
+        <!--
+        <menuitem
+        id="menu_refuse_purchase"
+        name="refuse"
+        parent="purchase_management_root"
+        action="action_refuse_purchase"
+        sequence="20"/>-->
+
+</odoo>

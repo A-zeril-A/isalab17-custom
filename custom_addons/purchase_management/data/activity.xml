@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+    <record id="mail_act_approval" model="mail.activity.type">
+        <field name="name">Purchase Approval</field>
+        <field name="res_model_id" ref="purchase_management.model_purchase_management"/>
+    </record>
+    
+    <record id="action_purchase_order_schedule_activity" model="ir.actions.server">
+        <field name="name">Create Schedule Activity for Purchase Order</field>
+        <field name="model_id" ref="model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            model.create_schedule_activity()
+        </field>
+        <field name="trigger_on_create">True</field>
+    </record>
+-->
+</odoo>

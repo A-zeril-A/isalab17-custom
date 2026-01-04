@@ -1,0 +1,27 @@
+<odoo>
+    <!-- Tree View for Custom Project Team Cost -->
+    <record id="view_custom_project_profitability_dashboard_tree" model="ir.ui.view">
+        <field name="name">custom.project.profitability.dashboard.tree</field>
+        <field name="model">custom.project.profitability.dashboard</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false" edit="false" duplicate="false" js_class="no_header" export_xlsx="false">
+                <field name="user_id"/>
+                <field name="total_hours"/>
+                <field name="hourly_rate"/>
+                <field name="total_payment"/>
+                <field name="project_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action for Custom Project Team Cost -->
+    <record id="action_custom_project_profitability_dashboard" model="ir.actions.act_window">
+        <field name="name">HR Total Cost</field>
+        <field name="res_model">custom.project.profitability.dashboard</field>
+        <field name="view_mode">tree</field>
+        <field name="target">new</field>
+        <field name="context">{'no_create': True'no_header': True 'no_footer': True}</field>
+        <field name="groups_id" eval="[(4, ref('custom_project_profitability_dashboard.group_custom_profitability_access'))]"/>
+    </record>
+
+</odoo>

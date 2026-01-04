@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Odoo
+*.log
+*.pot
+*.po
+
+# IDE settings
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*~
+*.copy
+
+# User-specific ignores
+custom_project_project .zero
+*.rightnow

@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+venv_*/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Local config (use template)
+*.cfg
+!*_template.cfg
+!isa*.cfg.template
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Odoo specific
+.local/
+filestore/
+sessions/
+

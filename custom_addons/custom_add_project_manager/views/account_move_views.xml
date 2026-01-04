@@ -1,0 +1,75 @@
+<odoo>
+    <!-- Invoice Form -->
+    <record id="view_move_form_inherit_custom" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.custom</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='invoice_origin']" position="attributes">
+                <attribute name="string">Protocol Number</attribute>
+            </xpath>
+            <!-- Add under Source Document -->
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+            <group string="Invoice">
+                <field name="project_manager_id"/>
+                <field name="client_order_number"/>
+                <field name="sale_order_date"/>
+                <field name="opportunity_id" widget="many2one_quick_create"/>
+                <field name="total_project_quantity"/>
+                <field name="sale_order_amount_untaxed"/>
+                <field name="sale_order_amount_tax"/>
+                <field name="sale_order_amount_total"/>
+                <field name="status_project"/>
+                <field name="manual_invoice_date"/>
+            </group>
+
+                                    <!-- Sale order invoices total information -->
+                <group string="Sale Order Invoice Summary">
+                    <field name="total_invoiced_amount"/>
+                    <field name="total_paid_amount"/>
+                    <field name="total_due_amount"/>
+                    <field name="sale_order_payment_status"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Invoices List -->
+    <record id="view_move_tree_inherit_custom" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.custom</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//tree/field[@name='invoice_origin']" position="attributes">
+                <attribute name="string">Protocol Number</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='invoice_date']" position="after">
+                <field name="project_manager_id" optional="hide" />
+                <field name="client_order_number" optional="hide"/>
+                <field name="sale_order_date" optional="hide"/>
+                <field name="order_date_sequence" optional="hide" />
+                <field name="opportunity_id" optional="hide" />
+                <field name="total_project_quantity" optional="hide" />
+                <field name="sale_order_amount_total" optional="hide" />
+                <field name="total_paid_amount" optional="hide" />
+                <field name="total_due_amount" optional="hide" />
+                <field name="status_project" optional="hide"/>
+                <field name="manual_invoice_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="view_account_move_search_inherit2" model="ir.ui.view">
+        <field name="name">account.move.search.inherit2</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/group" position="inside">
+                <filter name="group_by_invoice_origin" string="Protocol Number" context="{'group_by':'invoice_origin'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

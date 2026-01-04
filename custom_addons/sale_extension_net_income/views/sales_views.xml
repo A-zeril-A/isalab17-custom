@@ -1,0 +1,28 @@
+<odoo>
+    <record id="view_order_form_inherited" model="ir.ui.view">
+        <field name="name">sale.order.form.inherited</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Net Income">
+                    <group>
+                        <field name="custom_sale_order_ids">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="service_price"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group>
+                        <field name="custom_total_net_sum" colspan="2" string="Total Costs"/>
+                    </group>
+                    <group>
+                        <field name="new_total_value" colspan="2"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

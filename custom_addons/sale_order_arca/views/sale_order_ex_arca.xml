@@ -1,0 +1,12 @@
+<odoo>
+    <record id="sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.arca</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="arca" widget="char" pattern="^[0-9]*$" string="Arca"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

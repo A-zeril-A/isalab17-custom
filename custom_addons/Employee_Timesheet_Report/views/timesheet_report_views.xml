@@ -1,0 +1,122 @@
+<odoo>
+    <!-- Tree view -->
+    <record id="view_timesheet_report_tree" model="ir.ui.view">
+        <field name="name">timesheet.report.tree</field>
+        <field name="model">timesheet.report</field>
+        <field name="arch" type="xml">
+            <tree string="Timesheet Report">
+                <header>
+                    <button name="action_export_xml" 
+                            string="Export XML" 
+                            type="object" 
+                            class="btn-primary"
+                            title="Export selected records to XML"/>
+                </header>
+
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="date_time"/>
+                <field name="end_time"/>
+
+
+                <!-- Display fields for presentation -->
+                <field name="colored_delay_display" widget="html" string="Delay" optional="hide"/>
+                <field name="colored_day_display" widget="html" optional="hide"/>
+                <field name="total_hours" string="Total Hours" sum="total_hours"  widget="float_time"/>
+                <field name="office_hours" string="Office Hours" sum="office_hours"  widget="float_time"/>
+                <field name="hours_18_22" string="Overtime" sum="hours_18_22" widget="float_time" />
+                <field name="hours_22_06" string="Night Overtime 22–06" sum="hours_22_06" widget="float_time" />
+                <field name="hours_shortage" string="hours shortage" sum="hours_shortage" widget="float_time" />
+                <field name="leave_type" string="Type" optional="show"/>
+                
+
+                <!-- Helper fields -->
+                <field name="is_delayed" invisible="1"/>
+                <field name="is_short_hours" invisible="1"/>
+                <field name="is_holiday" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_timesheet_report_form" model="ir.ui.view">
+        <field name="name">timesheet.report.form</field>
+        <field name="model">timesheet.report</field>
+        <field name="arch" type="xml">
+            <form string="Timesheet Report">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                            <field name="project_id"/>
+                            <field name="task_id"/>
+                        </group>
+                        <group>
+                            <field name="date_time"/>
+                            <field name="end_time"/>
+                            <!-- <field name="total_hours_display" string="Total Hours"/>
+                            <field name="delay_display"/>
+                            <field name="colored_day_display" string="Day of Week"/>
+                            <field name="hours_shortage_display" string="Hours Shortage"/>
+                            <field name="office_hours_display" string="Office Hours"/> -->
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search and filters -->
+    <record id="view_timesheet_report_search" model="ir.ui.view">
+        <field name="name">timesheet.report.search</field>
+        <field name="model">timesheet.report</field>
+        <field name="arch" type="xml">
+            <search string="Timesheet Report">
+                <field name="employee_id" string="Employee Name" filter_domain="[
+                    '|',
+                    ('employee_id.name', 'ilike', self),
+                    ('employee_id.user_id.name', 'ilike', self)
+                ]"/>
+                <field name="date"/>
+                <field name="project_id"/>
+                <field name="task_id"/>
+
+
+                <separator/>
+                <filter string="My Timesheets" name="my_timesheets" domain="[('employee_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Delayed" name="delayed" domain="[('is_delayed', '=', True)]"/>
+                <filter string="On Time" name="on_time" domain="[('is_delayed', '=', False)]"/>
+                <separator/>
+                <filter string="Today" name="today" domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="This Week" name="this_week" domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="This Month" name="this_month" domain="[('date', '&gt;=', context_today().replace(day=1).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Delayed Status" name="group_delayed" context="{'group_by': 'is_delayed'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_timesheet_report" model="ir.actions.act_window">
+        <field name="name">Timesheet Report</field>
+        <field name="res_model">timesheet.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_timesheet_report_search"/>
+        <field name="context">{'search_default_my_timesheets': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Employee work hours report</p>
+            <p>This report displays employee working hours with lateness calculation.</p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_timesheet_report_root" name="Timesheet Reports"/>
+    <menuitem id="menu_timesheet_report" name="Timesheet Report" parent="menu_timesheet_report_root" action="action_timesheet_report"/>
+</odoo>
