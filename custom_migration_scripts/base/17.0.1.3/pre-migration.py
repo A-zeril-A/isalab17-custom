@@ -38,6 +38,9 @@ def migrate(cr, version):
     # Fix 4: Remove incompatible settings views (old xpath expressions)
     _fix_incompatible_settings_views(cr)
     
+    # Fix 5: Ensure l10n_it_exempt_reason column exists for l10n_it migration
+    _fix_l10n_it_exempt_reason(cr)
+    
     _logger.info("=" * 60)
     _logger.info("Custom pre-migration fixes completed!")
     _logger.info("=" * 60)
@@ -244,4 +247,49 @@ def _fix_incompatible_settings_views(cr):
         _logger.info("  No incompatible settings views found")
     else:
         _logger.info(f"  Total: {total_deleted} incompatible views removed")
+
+
+def _fix_l10n_it_exempt_reason(cr):
+    """
+    Ensure l10n_it_exempt_reason column exists in account_tax table.
+    
+    The l10n_it module has a migration script at version 0.8 that tries to update
+    the l10n_it_exempt_reason column without checking if it exists first.
+    This fails when the column doesn't exist in the database.
+    
+    Solution: Add the column if it doesn't exist. The l10n_it 0.8 migration will
+    then run without error (UPDATE will just match 0 rows if no data).
+    """
+    _logger.info("Fixing l10n_it_exempt_reason for l10n_it migration...")
+    
+    # Check if account_tax table exists
+    cr.execute("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_name = 'account_tax'
+        )
+    """)
+    if not cr.fetchone()[0]:
+        _logger.info("  Table account_tax does not exist, skipping")
+        return
+    
+    # Check if l10n_it_exempt_reason column exists
+    cr.execute("""
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'account_tax' 
+        AND column_name = 'l10n_it_exempt_reason'
+    """)
+    
+    if cr.fetchone():
+        _logger.info("  Column l10n_it_exempt_reason already exists")
+        return
+    
+    # Add the column so the l10n_it 0.8 migration won't fail
+    # The column will be properly configured when l10n_it module loads
+    cr.execute("""
+        ALTER TABLE account_tax 
+        ADD COLUMN l10n_it_exempt_reason VARCHAR(4)
+    """)
+    _logger.info("  Added column l10n_it_exempt_reason to account_tax table")
 
