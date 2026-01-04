@@ -18,9 +18,10 @@ venv_*/
 *.log
 logs/
 
-# Local config (use template)
-*.cfg
-!*_template.cfg
+# Local config
+# Keep migration and main config files
+!myodoo*.cfg
+!isa*.cfg
 !isa*.cfg.template
 
 # OS files
