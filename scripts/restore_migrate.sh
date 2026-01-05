@@ -83,6 +83,26 @@ drop_db() {
     fi
 }
 
+# Create template from existing isalab database (from previous migration)
+create_template_from_isalab() {
+    print_info "Creating template from existing '${TARGET_DB}' database..."
+    echo -e "    Source: ${YELLOW}${TARGET_DB}${NC}"
+    echo -e "    Target: ${YELLOW}${TEMPLATE_DB}${NC}"
+    echo ""
+    
+    # Drop existing template if exists
+    drop_db "$TEMPLATE_DB"
+    
+    # Disconnect all sessions from source
+    sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TARGET_DB';" > /dev/null 2>&1 || true
+    
+    # Create template from isalab
+    print_info "Copying database (this may take a while)..."
+    sudo -u postgres createdb -T "$TARGET_DB" -O "$PG_USER" "$TEMPLATE_DB"
+    
+    print_success "Template created: $TEMPLATE_DB (from existing $TARGET_DB)"
+}
+
 # List available backups
 list_backups() {
     echo ""
@@ -447,57 +467,76 @@ main() {
     
     print_step "1" "Database Preparation"
     
-    # Check if template exists
+    # Check current database status
+    local has_template=false
+    local has_isalab=false
+    
     if db_exists "$TEMPLATE_DB"; then
+        has_template=true
+    fi
+    
+    if db_exists "$TARGET_DB"; then
+        has_isalab=true
+    fi
+    
+    # Show status
+    if $has_template; then
         echo -e "  ${GREEN}📋 Template database exists:${NC} ${YELLOW}${TEMPLATE_DB}${NC}"
-        echo ""
-        echo -e "  ${CYAN}What would you like to do?${NC}"
-        echo ""
-        echo -e "    ${GREEN}[1]${NC} Create ${YELLOW}${TARGET_DB}${NC} from existing template (fast)"
-        echo -e "    ${GREEN}[2]${NC} Restore new backup to template (replace)"
-        echo -e "    ${GREEN}[3]${NC} Exit"
-        echo ""
-        read -p "  Select option [1-3]: " choice
-        
-        case $choice in
-            1)
-                print_step "2" "Creating Database from Template"
-                create_from_template
-                ;;
-            2)
-                if ! list_backups; then
-                    exit 1
-                fi
-                read -p "  Select backup number: " backup_num
-                
-                if [[ "$backup_num" =~ ^[0-9]+$ ]] && [ "$backup_num" -ge 1 ] && [ "$backup_num" -le ${#BACKUP_LIST[@]} ]; then
-                    selected_backup="${BACKUP_LIST[$((backup_num-1))]}"
-                    print_step "2" "Restoring Backup to Template"
-                    restore_to_template "$selected_backup"
-                    create_from_template
-                else
-                    print_error "Invalid selection"
-                    exit 1
-                fi
-                ;;
-            3)
-                echo ""
-                print_info "Exiting..."
-                exit 0
-                ;;
-            *)
-                print_error "Invalid option"
-                exit 1
-                ;;
-        esac
     else
         echo -e "  ${YELLOW}📋 No template database found:${NC} ${TEMPLATE_DB}"
-        echo ""
+    fi
+    
+    if $has_isalab; then
+        echo -e "  ${GREEN}📦 Previous migration database exists:${NC} ${YELLOW}${TARGET_DB}${NC}"
+    fi
+    echo ""
+    
+    # Build menu options dynamically
+    echo -e "  ${CYAN}What would you like to do?${NC}"
+    echo ""
+    
+    local opt=1
+    local opt_from_template=""
+    local opt_from_isalab=""
+    local opt_from_backup=""
+    local opt_exit=""
+    
+    if $has_template; then
+        echo -e "    ${GREEN}[${opt}]${NC} Create ${YELLOW}${TARGET_DB}${NC} from existing template (fast)"
+        opt_from_template=$opt
+        ((opt++))
+    fi
+    
+    if $has_isalab; then
+        echo -e "    ${GREEN}[${opt}]${NC} Save ${YELLOW}${TARGET_DB}${NC} as template, then recreate for fresh migration"
+        opt_from_isalab=$opt
+        ((opt++))
+    fi
+    
+    echo -e "    ${GREEN}[${opt}]${NC} Restore backup file to template"
+    opt_from_backup=$opt
+    ((opt++))
+    
+    echo -e "    ${GREEN}[${opt}]${NC} Exit"
+    opt_exit=$opt
+    
+    echo ""
+    read -p "  Select option [1-${opt}]: " choice
+    
+    if [ "$choice" = "$opt_from_template" ] && [ -n "$opt_from_template" ]; then
+        print_step "2" "Creating Database from Template"
+        create_from_template
         
+    elif [ "$choice" = "$opt_from_isalab" ] && [ -n "$opt_from_isalab" ]; then
+        print_step "2" "Creating Template from Existing Database"
+        create_template_from_isalab
+        create_from_template
+        
+    elif [ "$choice" = "$opt_from_backup" ]; then
         if ! list_backups; then
             exit 1
         fi
-        read -p "  Select backup number to restore: " backup_num
+        read -p "  Select backup number: " backup_num
         
         if [[ "$backup_num" =~ ^[0-9]+$ ]] && [ "$backup_num" -ge 1 ] && [ "$backup_num" -le ${#BACKUP_LIST[@]} ]; then
             selected_backup="${BACKUP_LIST[$((backup_num-1))]}"
@@ -508,6 +547,15 @@ main() {
             print_error "Invalid selection"
             exit 1
         fi
+        
+    elif [ "$choice" = "$opt_exit" ]; then
+        echo ""
+        print_info "Exiting..."
+        exit 0
+        
+    else
+        print_error "Invalid option"
+        exit 1
     fi
     
     # Setup OpenUpgrade prerequisites
