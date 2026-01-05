@@ -507,8 +507,8 @@ main() {
         ((opt++))
     fi
     
-    if $has_isalab; then
-        echo -e "    ${GREEN}[${opt}]${NC} Save ${YELLOW}${TARGET_DB}${NC} as template, then recreate for fresh migration"
+    if $has_isalab && ! $has_template; then
+        echo -e "    ${GREEN}[${opt}]${NC} Save ${YELLOW}${TARGET_DB}${NC} as new template (for future retries)"
         opt_from_isalab=$opt
         ((opt++))
     fi
@@ -530,6 +530,7 @@ main() {
     elif [ "$choice" = "$opt_from_isalab" ] && [ -n "$opt_from_isalab" ]; then
         print_step "2" "Creating Template from Existing Database"
         create_template_from_isalab
+        print_step "2b" "Creating Fresh Database from New Template"
         create_from_template
         
     elif [ "$choice" = "$opt_from_backup" ]; then
