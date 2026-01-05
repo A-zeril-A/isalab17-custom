@@ -9,12 +9,9 @@
       <field name="inherit_id" ref="project.project_view_kanban_inherit_project"/>
       <field name="arch" type="xml">
         <!-- Replace the button text 'Project Updates' with 'Contract Performance Sheet' -->
-        <xpath expr="//div[@role='menuitem']/a[@name='%(project.project_update_all_action)d']" position="replace">
-            <a name="%(project.project_update_all_action)d"           
-            type="action"            
-            t-attf-context="{'active_id': #{record.id.raw_value}}">
-                <span style="font-size: 11px;">Contract Performance Sheet</span>
-            </a>
+        <!-- Odoo 17+: name is now method name with type="object", not action ID -->
+        <xpath expr="//div[@role='menuitem']/a[@name='project_update_all_action']" position="replace">
+            <a name="project_update_all_action" type="object" t-attf-context="{'active_id': #{record.id.raw_value} }">Contract Performance Sheet</a>
         </xpath>
       </field>
     </record>
